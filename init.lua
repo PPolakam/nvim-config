@@ -73,7 +73,19 @@ require('lazy').setup({
     { 'ThePrimeagen/git-worktree.nvim' },
     { 'nvim-lualine/lualine.nvim' },
     { 'nvim-lua/popup.nvim' },
-    { 'nvim-telescope/telescope-fzy-native.nvim' }
+    { 'nvim-telescope/telescope-fzy-native.nvim' },
+    { 'christoomey/vim-tmux-navigator' },
+    { 'NeogitOrg/neogit', config = true },
+    {
+        "kdheepak/lazygit.nvim",
+    	cmd = {
+    		"LazyGit",
+    		"LazyGitConfig",
+    		"LazyGitCurrentFile",
+    		"LazyGitFilter",
+    		"LazyGitFilterCurrentFile",
+    	},
+    },
 })
 
 local lsp_zero = require('lsp-zero')
