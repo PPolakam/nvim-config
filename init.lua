@@ -86,6 +86,7 @@ require('lazy').setup({
     		"LazyGitFilterCurrentFile",
     	},
     },
+    { 'alexxGmZ/e-ink.nvim' }
 })
 
 local lsp_zero = require('lsp-zero')
@@ -107,6 +108,19 @@ require('mason-lspconfig').setup({
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
+
+local lspconfig = require("lspconfig")
+
+local servers = { "tsserver", "eslint", "pyright", "lua_ls", "rust_analyzer" }
+
+for _, server in ipairs(servers) do
+    lspconfig[server].setup {}
+end
+
+vim.o.tabstop = 4 -- A TAB character looks like 4 spaces
+vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a TAB character
+vim.o.softtabstop = 4 -- Number of spaces inserted instead of a TAB character
+vim.o.shiftwidth = 4 -- Number of spaces inserted when indenting
 
 cmp.setup({
   mapping = cmp.mapping.preset.insert({
