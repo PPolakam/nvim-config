@@ -24,8 +24,10 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
     {
-      "olimorris/onedarkpro.nvim",
-      priority = 1000, -- Ensure it loads first
+      "folke/tokyonight.nvim",
+      lazy = false,
+      priority = 1000,
+      opts = {},
     },
     {'williamboman/mason.nvim'},
     {'williamboman/mason-lspconfig.nvim'},
@@ -37,16 +39,6 @@ require('lazy').setup({
     },
     {
       'neovim/nvim-lspconfig',
-      dependencies = {
-        {'hrsh7th/cmp-nvim-lsp'},
-      }
-    },
-    -- Autocompletion
-    {
-      'hrsh7th/nvim-cmp',
-      dependencies = {
-        {'L3MON4D3/LuaSnip'}
-      },
     },
     {
         'nvim-treesitter/nvim-treesitter',
@@ -61,13 +53,6 @@ require('lazy').setup({
       'nvim-telescope/telescope.nvim', tag = '0.1.6',
 -- or                              , branch = '0.1.x',
       dependencies = { 'nvim-lua/plenary.nvim' }
-    },
-    {
-	"L3MON4D3/LuaSnip",
-	-- follow latest release.
-	version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-	-- install jsregexp (optional!).
-	build = "make install_jsregexp"
     },
     { 'mbbill/undotree' },
     { 'ThePrimeagen/git-worktree.nvim' },
@@ -86,11 +71,37 @@ require('lazy').setup({
     		"LazyGitFilterCurrentFile",
     	},
     },
-    { 'alexxGmZ/e-ink.nvim' }
-})
+    { 'alexxGmZ/e-ink.nvim' },
+    { 'catppuccin/nvim' },
+    {
+      'akinsho/flutter-tools.nvim',
+      lazy = false,
+      dependencies = {
+        'nvim-lua/plenary.nvim',
+        'stevearc/dressing.nvim', -- optional for vim.ui.select
+      },
+    },
+    {
+      'saghen/blink.cmp',
+      version = '1.*',
+      dependencies = { 'rafamadriz/friendly-snippets' },
+      build = 'cargo build --release',
+      opts = {
+        fuzzy = { implementation = "prefer_rust" },
+        keymap = { preset = 'super-tab' },
+        appearance = { nerd_font_variant = 'mono' },
+        completion = { documentation = { auto_show = false } },
+        sources = {
+          default = { 'lsp', 'path', 'snippets', 'buffer' },
+        },
+        signature = { enabled = true },
+      },
+    }
+}) -- neovim/lspconfig
 
+
+local capabilities = require('blink.cmp').get_lsp_capabilities()
 local lsp_zero = require('lsp-zero')
-
 lsp_zero.on_attach(function(client, bufnr)
   -- see :help lsp-zero-keybindings
   -- to learn the available actions
@@ -101,41 +112,21 @@ end)
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  handlers = {
-    lsp_zero.default_setup,
-  },
+    ensure_installed = { "tsserver", "eslint", "pyright", "lua_ls", "rust_analyzer", "html" },
+    handlers = {
+      function(server_name)
+        require('lspconfig')[server_name].setup({
+          capabilities = capabilities,
+        })
+      end,
+    },
 })
 
-local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
+lsp_zero.setup({})
 
-local lspconfig = require("lspconfig")
-
-local servers = { "tsserver", "eslint", "pyright", "lua_ls", "rust_analyzer" }
-
-for _, server in ipairs(servers) do
-    lspconfig[server].setup {}
-end
-
-vim.o.tabstop = 4 -- A TAB character looks like 4 spaces
+vim.o.tabstop = 2 -- A TAB character looks like 4 spaces
 vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a TAB character
-vim.o.softtabstop = 4 -- Number of spaces inserted instead of a TAB character
-vim.o.shiftwidth = 4 -- Number of spaces inserted when indenting
+vim.o.softtabstop = 2 -- Number of spaces inserted instead of a TAB character
+vim.o.shiftwidth = 2 -- Number of spaces inserted when indenting
 
-cmp.setup({
-  mapping = cmp.mapping.preset.insert({
-    -- `Enter` key to confirm completion
-    ['<CR>'] = cmp.mapping.confirm({select = false}),
 
-    -- Ctrl+Space to trigger completion menu
-    ['<C-Space>'] = cmp.mapping.complete(),
-
-    -- Navigate between snippet placeholder
-    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
-
-    -- Scroll up and down in the completion documentation
-    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-d>'] = cmp.mapping.scroll_docs(4),
-  })
-})

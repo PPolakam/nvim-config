@@ -27,5 +27,5 @@ function ColorMyPencils(color)
         vim.cmd('hi! LineNr guibg=none ctermbg=none')
 end
 
-ColorMyPencils('e-ink')
+ColorMyPencils('tokyonight-storm')
 
