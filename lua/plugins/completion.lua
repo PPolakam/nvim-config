@@ -1,4 +1,4 @@
-return {
+--[[return {
   {
     'saghen/blink.cmp',
     dependencies = { 'rafamadriz/friendly-snippets' },
@@ -22,4 +22,4 @@ return {
     },
     opts_extend = { "sources.default" }
   }
-}
+}]]--

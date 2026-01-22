@@ -22,7 +22,10 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-require('lazy').setup({
+local lazy = require('lazy')
+
+lazy.setup({
+  spec = {
     {
       "folke/tokyonight.nvim",
       lazy = false,
@@ -96,9 +99,86 @@ require('lazy').setup({
         },
         signature = { enabled = true },
       },
-    }
+    },
+    {
+      "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+      config = function()
+        require("lsp_lines").setup()
+          vim.diagnostic.config({
+            virtual_text = false, -- lsp_lines replaces inline virtual text
+          })
+      end,
+    },
+    {
+      "akinsho/toggleterm.nvim",
+      version = "*",
+      config = function()
+        require("toggleterm").setup({
+          direction = "float",
+          float_opts = {
+            border = "curved",
+            title_pos = "left"
+          }
+        })
+      end,
+    },
+    {
+      "nyoom-engineering/oxocarbon.nvim"
+    },
+    {
+      'kkrampis/codex.nvim',
+      lazy = true,
+      cmd = { 'Codex', 'CodexToggle' }, -- Optional: Load only on command execution
+      keys = {
+        {
+          '<leader>cc', -- Change this to your preferred keybinding
+          function() require('codex').toggle() end,
+          desc = 'Toggle Codex popup or side-panel',
+          mode = { 'n', 't' }
+        },
+      },
+      opts = {
+        keymaps = {
+          toggle = nil, -- Keybind to toggle Codex window (Disabled by default, watch out for conflicts)
+          quit = '<C-q>', -- Keybind to close the Codex window (default: Ctrl + q)
+        },         -- Disable internal default keymap (<leader>cc -> :CodexToggle)
+        border      = 'rounded',  -- Options: 'single', 'double', or 'rounded'
+        width       = 0.8,        -- Width of the floating window (0.0 to 1.0)
+        height      = 0.8,        -- Height of the floating window (0.0 to 1.0)
+        model       = nil,        -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
+        autoinstall = true,       -- Automatically install the Codex CLI if not found
+        panel       = false,      -- Open Codex in a side-panel (vertical split) instead of floating window
+        use_buffer  = false,      -- Capture Codex stdout into a normal buffer instead of a terminal buffer
+      },
+    } 
+  },
+  { import = "plugins" }
 }) -- neovim/lspconfig
 
+vim.api.nvim_create_autocmd("TermOpen", {
+  callback = function()
+    local name = vim.api.nvim_buf_get_name(0)
+    if name:lower():match("codex") then
+      vim.keymap.set("t", "<Up>", "<Up>", { buffer = true })
+      vim.keymap.set("t", "<Down>", "<Down>", { buffer = true })
+    end
+  end,
+})
+
+
+vim.diagnostic.config({
+  virtual_text = false,
+})
+
+vim.o.updatetime = 250
+
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false, scope = "line" })
+  end,
+})
+
+vim.keymap.set("n", "<leader>pn", ":ToggleTerm<CR>")
 
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 local lsp_zero = require('lsp-zero')
@@ -112,7 +192,7 @@ end)
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { "tsserver", "eslint", "pyright", "lua_ls", "rust_analyzer", "html" },
+    ensure_installed = { "tsserver", "eslint", "pyright", "lua_ls", "rust_analyzer", "html", "gopls" },
     handlers = {
       function(server_name)
         require('lspconfig')[server_name].setup({
@@ -126,7 +206,7 @@ lsp_zero.setup({})
 
 vim.o.tabstop = 2 -- A TAB character looks like 4 spaces
 vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a TAB character
-vim.o.softtabstop = 2 -- Number of spaces inserted instead of a TAB character
+vim.o.softtabstop = 4 -- Number of spaces inserted instead of a TAB character
 vim.o.shiftwidth = 2 -- Number of spaces inserted when indenting
 
 
