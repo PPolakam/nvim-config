@@ -150,7 +150,27 @@ lazy.setup({
         panel       = false,      -- Open Codex in a side-panel (vertical split) instead of floating window
         use_buffer  = false,      -- Capture Codex stdout into a normal buffer instead of a terminal buffer
       },
-    } 
+    },
+    {
+      "windwp/nvim-ts-autotag"
+    },
+    { 
+      "thesimonho/kanagawa-paper.nvim",
+      config = function()
+        -- vim.cmd.colorscheme("kanagawa-paper")
+      end,
+    },
+    {
+      "nvim-lualine/lualine.nvim",
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      config = function()
+        vim.o.laststatus = 3
+        vim.o.showmode = false
+        require("lualine").setup({
+          options = { theme = "gruvbox", globalstatus = true },
+        })
+      end,
+    }
   },
   { import = "plugins" }
 }) -- neovim/lspconfig
@@ -192,7 +212,18 @@ end)
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { "tsserver", "eslint", "pyright", "lua_ls", "rust_analyzer", "html", "gopls" },
+    ensure_installed = {
+      "ts_ls",
+      "eslint",
+      "pyright",
+      "lua_ls",
+      "rust_analyzer",
+      "emmet_ls",
+      "gopls",
+      "svelte",
+      "tailwindcss",
+      "nim_langserver"
+    },
     handlers = {
       function(server_name)
         require('lspconfig')[server_name].setup({
@@ -209,4 +240,7 @@ vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a T
 vim.o.softtabstop = 4 -- Number of spaces inserted instead of a TAB character
 vim.o.shiftwidth = 2 -- Number of spaces inserted when indenting
 
+vim.cmd.colorscheme("tokyonight")
 
+vim.o.laststatus = 3      -- single global statusline (nice modern look)
+vim.o.showmode = false    -- don't show mode twice (since lualine shows it)
