@@ -1,10 +1,17 @@
-require("czn")
+  require("czn")
 
 vim.cmd("set number")
 vim.cmd("set relativenumber")
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 local uv = vim.uv or vim.loop
+local theme
+
+if vim.o.background == "light" then
+  theme = "iceberg_light"
+else
+  theme = "tokyonight"
+end
 
 -- Auto-install lazy.nvim if not present
 if not uv.fs_stat(lazypath) then
@@ -59,7 +66,6 @@ lazy.setup({
     },
     { 'mbbill/undotree' },
     { 'ThePrimeagen/git-worktree.nvim' },
-    { 'nvim-lualine/lualine.nvim' },
     { 'nvim-lua/popup.nvim' },
     { 'nvim-telescope/telescope-fzy-native.nvim' },
     { 'christoomey/vim-tmux-navigator' },
@@ -167,10 +173,16 @@ lazy.setup({
         vim.o.laststatus = 3
         vim.o.showmode = false
         require("lualine").setup({
-          options = { theme = "gruvbox", globalstatus = true },
+          options = { 
+            theme = "auto",
+            globalstatus = true,
+            section_separators = { left = "", right = "" },
+            component_separators = { left = "│", right = "│" }
+          },
         })
       end,
-    }
+    },
+    { 'ThePrimeagen/vim-be-good' }
   },
   { import = "plugins" }
 }) -- neovim/lspconfig
